@@ -1,3 +1,6 @@
+//download&extract http://sourceforge.net/projects/jung/files/latest/download?source=files
+//javac -cp .:* RandomGraphGeneration.java
+
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -9,7 +12,7 @@ import org.apache.commons.collections15.functors.InstantiateFactory;
 import edu.uci.ics.jung.io.GraphMLWriter;
 import java.io.*;
 
-public class BasicGraphCreation {        
+public class RandomGraphGeneration {        
     public static void main(String[] args) throws Exception{
 	SparseGraph<MyVertex, MyEdge> cake = new SparseGraph<MyVertex, MyEdge>();
 	ConstantFactory<Graph<MyVertex, MyEdge>> graphFactory = new ConstantFactory<Graph<MyVertex,MyEdge>>(cake);
