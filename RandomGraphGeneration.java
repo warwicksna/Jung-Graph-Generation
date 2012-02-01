@@ -20,18 +20,18 @@ public class RandomGraphGeneration {
 	InstantiateFactory<MyEdge> edgeFactory = new InstantiateFactory<MyEdge>(MyEdge.class);
 	HashSet<MyVertex> seedVertices = new HashSet<MyVertex>();
 
-
+        int evolve = 1;
         int degree = 10;
         for(int agents = 100; agents <= 500; agents+=100){
             BarabasiAlbertGenerator<MyVertex,MyEdge> gen = new BarabasiAlbertGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, seedVertices);
-            gen.evolveGraph(10);
+            gen.evolveGraph(evolve);
             writeOut(gen.create(), Integer.toString(agents)+"agents.graphml");
 	}
         
         int agents = 100;
         for(degree = 5; degree <= 50; degree+=5){
             BarabasiAlbertGenerator<MyVertex,MyEdge> gen = new BarabasiAlbertGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, seedVertices);
-            gen.evolveGraph(10);
+            gen.evolveGraph(evolve);
             writeOut(gen.create(), Integer.toString(degree)+"degree.graphml");
         }
         
