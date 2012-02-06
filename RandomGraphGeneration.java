@@ -4,7 +4,7 @@
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
-import edu.uci.ics.jung.algorithms.generators.random.BarabasiAlbertGenerator;
+import edu.uci.ics.jung.algorithms.generators.random.*;
 import org.apache.commons.collections15.functors.ConstantFactory;
 import edu.uci.ics.jung.graph.SparseGraph;
 import java.util.HashSet;
@@ -12,28 +12,46 @@ import org.apache.commons.collections15.functors.InstantiateFactory;
 import edu.uci.ics.jung.io.GraphMLWriter;
 import java.io.*;
 
-public class RandomGraphGeneration {        
+public class RandomGraphGeneration {       
     public static void main(String[] args) throws Exception{
 	SparseGraph<MyVertex, MyEdge> cake = new SparseGraph<MyVertex, MyEdge>();
 	ConstantFactory<Graph<MyVertex, MyEdge>> graphFactory = new ConstantFactory<Graph<MyVertex,MyEdge>>(cake);
 	InstantiateFactory<MyVertex> vertexFactory = new InstantiateFactory<MyVertex>(MyVertex.class);
 	InstantiateFactory<MyEdge> edgeFactory = new InstantiateFactory<MyEdge>(MyEdge.class);
 	HashSet<MyVertex> seedVertices = new HashSet<MyVertex>();
-
         int evolve = 1;
         int degree = 10;
-        for(int agents = 100; agents <= 500; agents+=100){
-            BarabasiAlbertGenerator<MyVertex,MyEdge> gen = new BarabasiAlbertGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, seedVertices);
-            gen.evolveGraph(evolve);
-            writeOut(gen.create(), Integer.toString(agents)+"agents.graphml");
-	}
-        
         int agents = 100;
-        for(degree = 5; degree <= 50; degree+=5){
-            BarabasiAlbertGenerator<MyVertex,MyEdge> gen = new BarabasiAlbertGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, seedVertices);
-            gen.evolveGraph(evolve);
-            writeOut(gen.create(), Integer.toString(degree)+"degree.graphml");
-        }
+
+       //ignoring generateMixedRandomGraph because we don't want mixed graphs
+
+       //ErdosRenyiGenerator<MyVertex,MyEdge> gen = new ErdosRenyiGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, 0.1);
+       //cannot find symbol
+
+       int latticeSize = 5;
+       KleinbergSmallWorldGenerator<MyVertex,MyEdge> gen3 = new KleinbergSmallWorldGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, latticeSize, 0.1);
+       System.out.println(gen3.create().toString()); //beware of IndexOutOfBounds related to vertexFactory
+
+       int iterations = 5;
+       EppsteinPowerLawGenerator<MyVertex,MyEdge> gen1 = new EppsteinPowerLawGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, iterations);
+       System.out.println(gen1.create().toString()); 
+
+       BarabasiAlbertGenerator<MyVertex,MyEdge> gen2 = new BarabasiAlbertGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, seedVertices);
+       gen2.evolveGraph(evolve);
+       System.out.println(gen2.create().toString()); 
+
+       
+//         for(int agents = 100; agents <= 500; agents+=100){//500
+//             BarabasiAlbertGenerator<MyVertex,MyEdge> gen = new BarabasiAlbertGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, seedVertices);
+//             gen.evolveGraph(evolve);
+//             writeOut(gen.create(), Integer.toString(agents)+"agents.graphml");
+// 	}
+//         int agents = 100;
+//         for(degree = 5; degree <= 50; degree+=5){
+//             BarabasiAlbertGenerator<MyVertex,MyEdge> gen = new BarabasiAlbertGenerator<MyVertex,MyEdge>(graphFactory, vertexFactory, edgeFactory, agents, degree, seedVertices);
+//             gen.evolveGraph(evolve);
+//             writeOut(gen.create(), Integer.toString(degree)+"degree.graphml");
+//         }
         
     }
 
@@ -41,7 +59,7 @@ public class RandomGraphGeneration {
         GraphMLWriter<MyVertex, MyEdge> graphWriter = new GraphMLWriter<MyVertex, MyEdge>(); 
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filepath)));
         graphWriter.save(g, out);
-        System.out.println(filepath);// + g.toString());    
+        System.out.println(g.toString());// + g.toString());    
     }
 }
 
