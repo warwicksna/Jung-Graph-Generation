@@ -31,33 +31,49 @@ public class GraphFactory
 	{
 		Graph graph;
 		
-		// System.out.println("Wanted\t\t\t\tFound\t\t\t\tDifference\n============================================================================");
-		// 
-		// for (int targetPopulationSizeIndex = 0; targetPopulationSizeIndex < targetPopulationSizes.length; targetPopulationSizeIndex++)
-		// {
-		// 	for (int targetVertexDegreeIndex = 0; targetVertexDegreeIndex < targetVertexDegrees.length; targetVertexDegreeIndex++)
-		// 	{
-		// 		int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
-		// 		float targetVertexDegree = targetVertexDegrees[targetVertexDegreeIndex];
-		// 		
-		// 		graph = getRandomGraph(targetPopulationSize, targetVertexDegree);
-		// 		
-		// 		System.out.format("(|V| = %-4d, |E| = %-6.0f)\t(|V| = %-4d, |E| = %-6d)\t%.0f\t%-3.1f\n", targetPopulationSize, targetVertexDegree * targetPopulationSize, graph.getVertexCount(), graph.getEdgeCount(), Math.abs(targetVertexDegree * targetPopulationSize - graph.getEdgeCount()), Math.abs(targetVertexDegree * targetPopulationSize - graph.getEdgeCount()) / (targetVertexDegree * targetPopulationSize) * 100);
-		// 	}
-		// }
+		System.out.println("Random Graph\n============\n");
 		
-		// for (int targetPopulationSizeIndex = 0; targetPopulationSizeIndex < targetPopulationSizes.length; targetPopulationSizeIndex++)
-		// {
-		// 	for (int targetVertexDegreeIndex = 0; targetVertexDegreeIndex < targetVertexDegrees.length; targetVertexDegreeIndex++)
-		// 	{
-		// 		int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
-		// 		int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
-		// 		
-		// 		graph = getScaleFreeGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
-		// 		
-		// 		System.out.format("|V| = %d, |E| = %d\n", graph.getVertexCount(), graph.getEdgeCount());				
-		// 	}
-		// }
+		System.out.println("Target\t\t\t\t| Actual\t\t\t| Difference");
+		System.out.println("|V|\t\t|E|\t\t| |V|\t\t|E|\t\t| #\t\t%");
+		System.out.println("--------------------------------+-------------------------------+--------------------------------");
+		
+		for (int targetPopulationSizeIndex = 0; targetPopulationSizeIndex < targetPopulationSizes.length; targetPopulationSizeIndex++)
+		{
+			for (int targetVertexDegreeIndex = 0; targetVertexDegreeIndex < targetVertexDegrees.length; targetVertexDegreeIndex++)
+			{
+				int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
+				float targetVertexDegree = targetVertexDegrees[targetVertexDegreeIndex];
+				
+				graph = getRandomGraph(targetPopulationSize, targetVertexDegree);
+				
+				int targetEdgeCount = (int) (targetVertexDegree * ((float) targetPopulationSize));
+				
+				int actualPopulationSize = graph.getVertexCount();
+				int actualEdgeCount = graph.getEdgeCount();
+				
+				int edgeCountDifference = (int) Math.round(Math.abs(targetEdgeCount - actualEdgeCount));
+				int edgeCountPercentageDifference = (int) Math.round((((float) edgeCountDifference) / ((float) targetEdgeCount)) * 100.0);
+				System.out.format("%8d\t%8d\t| %8d\t%8d\t| %8d\t%8d\n", targetPopulationSize, targetEdgeCount, actualPopulationSize, actualEdgeCount, edgeCountDifference, edgeCountPercentageDifference);				
+			}
+			
+			if (targetPopulationSizeIndex == targetPopulationSizes.length - 1)
+			{
+				System.out.println("=================================================================================================\n");
+			}
+			else
+			{
+				System.out.println("--------------------------------+-------------------------------+--------------------------------");
+			}
+		}
+		
+		System.out.println("Scale-Free Graph\n================\n");
+		System.out.println(" + initial number of vertices = 0.5 * |V|");
+		System.out.println(" +        number of timesteps = 0.5 * |V|");
+		System.out.println(" +  edges to add per timestep = (2 * |E|) / |V|\n");
+		
+		System.out.println("Target\t\t\t\t| Actual\t\t\t| Difference");
+		System.out.println("|V|\t\t|E|\t\t| |V|\t\t|E|\t\t| #\t\t%");
+		System.out.println("--------------------------------+-------------------------------+--------------------------------");
 		
 		for (int targetPopulationSizeIndex = 0; targetPopulationSizeIndex < targetPopulationSizes.length; targetPopulationSizeIndex++)
 		{
@@ -65,14 +81,68 @@ public class GraphFactory
 			{
 				int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
 				int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
+				int targetEdgeCount = (int) (targetVertexDegree * ((float) targetPopulationSize));
+				
+				graph = getScaleFreeGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
+				
+				int actualPopulationSize = graph.getVertexCount();
+				int actualEdgeCount = graph.getEdgeCount();
+				
+				int edgeCountDifference = (int) Math.round(Math.abs(targetEdgeCount - actualEdgeCount));
+				int edgeCountPercentageDifference = (int) Math.round((((float) edgeCountDifference) / ((float) targetEdgeCount)) * 100.0);
+				
+				System.out.format("%8d\t%8d\t| %8d\t%8d\t| %8d\t%8d\n", targetPopulationSize, targetEdgeCount, actualPopulationSize, actualEdgeCount, edgeCountDifference, edgeCountPercentageDifference);
+			}
+			
+			if (targetPopulationSizeIndex == targetPopulationSizes.length - 1)
+			{
+				System.out.println("=================================================================================================\n");
+			}
+			else
+			{
+				System.out.println("--------------------------------+-------------------------------+--------------------------------");
+			}
+		}
+		
+		System.out.println("Small-World Graph\n=================\n");
+		System.out.println(" + number of long distance connections = max(1, (|E| - 2 * |V|) / |V|)");
+		System.out.println(" +                    cluster exponent = 2");
+		System.out.println(" +                        lattice size = sqrt(|V|)\n");
+		
+		System.out.println("Target\t\t\t\t| Actual\t\t\t| Difference");
+		System.out.println("|V|\t\t|E|\t\t| |V|\t\t|E|\t\t| #\t\t%");
+		System.out.println("--------------------------------+-------------------------------+--------------------------------");
+		
+		for (int targetPopulationSizeIndex = 0; targetPopulationSizeIndex < targetPopulationSizes.length; targetPopulationSizeIndex++)
+		{
+			for (int targetVertexDegreeIndex = 0; targetVertexDegreeIndex < targetVertexDegrees.length; targetVertexDegreeIndex++)
+			{
+				int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
+				int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
+				int targetEdgeCount = (int) (targetVertexDegree * ((float) targetPopulationSize));
 				
 				graph = getSmallWorldGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
 				
-				System.out.format("|V| = %d, |E| = %d\n", graph.getVertexCount(), graph.getEdgeCount());				
+				int actualPopulationSize = graph.getVertexCount();
+				int actualEdgeCount = graph.getEdgeCount();
+				
+				int edgeCountDifference = (int) Math.round(Math.abs(targetEdgeCount - actualEdgeCount));
+				int edgeCountPercentageDifference = (int) Math.round((((float) edgeCountDifference) / ((float) targetEdgeCount)) * 100.0);
+				
+				System.out.format("%8d\t%8d\t| %8d\t%8d\t| %8d\t%8d\n", targetPopulationSize, targetEdgeCount, actualPopulationSize, actualEdgeCount, edgeCountDifference, edgeCountPercentageDifference);
+			}
+			
+			if (targetPopulationSizeIndex == targetPopulationSizes.length - 1)
+			{
+				System.out.println("=================================================================================================\n");
+			}
+			else
+			{
+				System.out.println("--------------------------------+-------------------------------+--------------------------------");
 			}
 		}
 	}
-
+	
 	public static Graph getRandomGraph(int targetPopulationSize, float targetVertexDegree)
 	{
 		// work out probability of a connection
@@ -137,7 +207,7 @@ public class GraphFactory
 		
 		int latticeSize = (int) Math.round(Math.sqrt(targetPopulationSize));
 		
-		System.out.format("SmallWorldGraph targets: (p = %d, e = %d) latticeSize: %d connections: %d\n", targetPopulationSize, targetEdgeCount, latticeSize, numberOfLongDistanceConnections);
+		// System.out.format("SmallWorldGraph targets: (p = %d, e = %d) latticeSize: %d connections: %d\n", targetPopulationSize, targetEdgeCount, latticeSize, numberOfLongDistanceConnections);
 		
 		KleinbergSmallWorldGenerator<MyVertex, MyEdge> generator = new KleinbergSmallWorldGenerator<MyVertex, MyEdge>(undirectedGraphFactory, vertexFactory, edgeFactory, latticeSize, 2.0);
 		generator.setConnectionCount(numberOfLongDistanceConnections);
