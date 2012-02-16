@@ -7,6 +7,7 @@ import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 // Jung generators
 import edu.uci.ics.jung.algorithms.generators.random.ErdosRenyiGenerator;
 import edu.uci.ics.jung.algorithms.generators.random.BarabasiAlbertGenerator;
+import edu.uci.ics.jung.algorithms.generators.random.KleinbergSmallWorldGenerator;
 
 // Collection factories
 import org.apache.commons.collections15.functors.ConstantFactory;
@@ -45,6 +46,19 @@ public class GraphFactory
 		// 	}
 		// }
 		
+		// for (int targetPopulationSizeIndex = 0; targetPopulationSizeIndex < targetPopulationSizes.length; targetPopulationSizeIndex++)
+		// {
+		// 	for (int targetVertexDegreeIndex = 0; targetVertexDegreeIndex < targetVertexDegrees.length; targetVertexDegreeIndex++)
+		// 	{
+		// 		int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
+		// 		int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
+		// 		
+		// 		graph = getScaleFreeGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
+		// 		
+		// 		System.out.format("|V| = %d, |E| = %d\n", graph.getVertexCount(), graph.getEdgeCount());				
+		// 	}
+		// }
+		
 		for (int targetPopulationSizeIndex = 0; targetPopulationSizeIndex < targetPopulationSizes.length; targetPopulationSizeIndex++)
 		{
 			for (int targetVertexDegreeIndex = 0; targetVertexDegreeIndex < targetVertexDegrees.length; targetVertexDegreeIndex++)
@@ -52,7 +66,7 @@ public class GraphFactory
 				int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
 				int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
 				
-				graph = getScaleFreeGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
+				graph = getSmallWorldGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
 				
 				System.out.format("|V| = %d, |E| = %d\n", graph.getVertexCount(), graph.getEdgeCount());				
 			}
@@ -100,6 +114,33 @@ public class GraphFactory
 		
 		// create the graph using evolution
 		generator.evolveGraph(timesteps);
+		
+		return generator.create();
+	}
+	
+	// a = 2 (if graph is undirected)
+	// a = 4 (if graph is directed)
+	//
+	// |E| = a|V| + c|V|
+	// where:
+	// c = number of long distance connections
+	// c = (|E| - a|V|) / |V|
+	//
+	// |V| = l * l
+	// where:
+	// l = lattice size
+	// l = sqrt(|V|);
+	public static Graph getSmallWorldGraph(int targetPopulationSize, int targetEdgeCount)
+	{
+		int numberOfLongDistanceConnections = (int) Math.round((targetEdgeCount - targetPopulationSize) / targetPopulationSize);
+		numberOfLongDistanceConnections = (numberOfLongDistanceConnections < 1) ? 1 : numberOfLongDistanceConnections;
+		
+		int latticeSize = (int) Math.round(Math.sqrt(targetPopulationSize));
+		
+		System.out.format("SmallWorldGraph targets: (p = %d, e = %d) latticeSize: %d connections: %d\n", targetPopulationSize, targetEdgeCount, latticeSize, numberOfLongDistanceConnections);
+		
+		KleinbergSmallWorldGenerator<MyVertex, MyEdge> generator = new KleinbergSmallWorldGenerator<MyVertex, MyEdge>(undirectedGraphFactory, vertexFactory, edgeFactory, latticeSize, 2.0);
+		generator.setConnectionCount(numberOfLongDistanceConnections);
 		
 		return generator.create();
 	}
