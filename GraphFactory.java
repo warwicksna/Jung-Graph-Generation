@@ -27,6 +27,7 @@ import java.io.IOException;
 public class GraphFactory
 {
 	protected static InstantiateFactory undirectedGraphFactory = new InstantiateFactory(UndirectedSparseGraph.class);
+	// protected static InstantiateFactory directedGraphFactory = new InstantiateFactory(SparseGraph.class);
 		
 	protected static InstantiateFactory<MyVertex> vertexFactory = new InstantiateFactory<MyVertex>(MyVertex.class);
 	protected static InstantiateFactory<MyEdge> edgeFactory = new InstantiateFactory<MyEdge>(MyEdge.class);
@@ -60,6 +61,9 @@ public class GraphFactory
 				int edgeCountDifference = (int) Math.round(Math.abs(targetEdgeCount - actualEdgeCount));
 				int edgeCountPercentageDifference = (int) Math.round((((float) edgeCountDifference) / ((float) targetEdgeCount)) * 100.0);
 				System.out.format("%8d\t%8d\t| %8d\t%8d\t| %8d\t%8d\n", targetPopulationSize, targetEdgeCount, actualPopulationSize, actualEdgeCount, edgeCountDifference, edgeCountPercentageDifference);				
+				
+				String filename = String.format("Random - %d nodes - %d edges.graphml", targetPopulationSize, targetEdgeCount);
+				writeToFile(graph, filename);				
 			}
 			
 			if (targetPopulationSizeIndex == targetPopulationSizes.length - 1)
@@ -98,6 +102,9 @@ public class GraphFactory
 				int edgeCountPercentageDifference = (int) Math.round((((float) edgeCountDifference) / ((float) targetEdgeCount)) * 100.0);
 				
 				System.out.format("%8d\t%8d\t| %8d\t%8d\t| %8d\t%8d\n", targetPopulationSize, targetEdgeCount, actualPopulationSize, actualEdgeCount, edgeCountDifference, edgeCountPercentageDifference);
+				
+				String filename = String.format("Scale-Free - %d nodes - %d edges.graphml", targetPopulationSize, targetEdgeCount);
+				writeToFile(graph, filename);
 			}
 			
 			if (targetPopulationSizeIndex == targetPopulationSizes.length - 1)
@@ -136,6 +143,9 @@ public class GraphFactory
 				int edgeCountPercentageDifference = (int) Math.round((((float) edgeCountDifference) / ((float) targetEdgeCount)) * 100.0);
 				
 				System.out.format("%8d\t%8d\t| %8d\t%8d\t| %8d\t%8d\n", targetPopulationSize, targetEdgeCount, actualPopulationSize, actualEdgeCount, edgeCountDifference, edgeCountPercentageDifference);
+				
+				String filename = String.format("Small-World - %d nodes - %d edges.graphml", targetPopulationSize, targetEdgeCount);
+				writeToFile(graph, filename);
 			}
 			
 			if (targetPopulationSizeIndex == targetPopulationSizes.length - 1)
@@ -179,10 +189,10 @@ public class GraphFactory
 		int edgesToAddPerTimestep = (int) Math.round((2.0 * ((float) targetEdgeCount)) / ((float) targetPopulationSize));
 		
 		// create a graph generator
-		SparseGraph<MyVertex, MyEdge> graph = new SparseGraph<MyVertex, MyEdge>();
-		ConstantFactory graphFactory = new ConstantFactory(graph);
+		// SparseGraph<MyVertex, MyEdge> graph = new SparseGraph<MyVertex, MyEdge>();
+		// ConstantFactory graphFactory = new ConstantFactory(graph);
 		Set seedVertices = new HashSet<MyVertex>();
-		BarabasiAlbertGenerator<MyVertex, MyEdge> generator = new BarabasiAlbertGenerator<MyVertex, MyEdge>(graphFactory, vertexFactory, edgeFactory, initialVertexCount, edgesToAddPerTimestep, seedVertices);
+		BarabasiAlbertGenerator<MyVertex, MyEdge> generator = new BarabasiAlbertGenerator<MyVertex, MyEdge>(undirectedGraphFactory, vertexFactory, edgeFactory, initialVertexCount, edgesToAddPerTimestep, seedVertices);
 		
 		// create the graph using evolution
 		generator.evolveGraph(timesteps);
@@ -208,16 +218,14 @@ public class GraphFactory
 		numberOfLongDistanceConnections = (numberOfLongDistanceConnections < 1) ? 1 : numberOfLongDistanceConnections;
 		
 		int latticeSize = (int) Math.round(Math.sqrt(targetPopulationSize));
-		
-		// System.out.format("SmallWorldGraph targets: (p = %d, e = %d) latticeSize: %d connections: %d\n", targetPopulationSize, targetEdgeCount, latticeSize, numberOfLongDistanceConnections);
-		
+				
 		KleinbergSmallWorldGenerator<MyVertex, MyEdge> generator = new KleinbergSmallWorldGenerator<MyVertex, MyEdge>(undirectedGraphFactory, vertexFactory, edgeFactory, latticeSize, 2.0);
 		generator.setConnectionCount(numberOfLongDistanceConnections);
 		
 		return generator.create();
 	}
 	
-	public static void writeToFile(Graph graph, String filename)
+	public static void writeToFile(Graph<MyVertex, MyEdge> graph, String filename)
 	{
 		GraphMLWriter<MyVertex, MyEdge> graphMLWriter = new GraphMLWriter<MyVertex, MyEdge>();
 		
