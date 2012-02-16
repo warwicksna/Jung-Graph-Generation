@@ -42,12 +42,11 @@ public class GraphFactory
 			for (int targetVertexDegreeIndex = 0; targetVertexDegreeIndex < targetVertexDegrees.length; targetVertexDegreeIndex++)
 			{
 				int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
-				float targetVertexDegree = targetVertexDegrees[targetVertexDegreeIndex];
+				int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
+				int targetEdgeCount = targetVertexDegree * targetPopulationSize;
 				
-				graph = getRandomGraph(targetPopulationSize, targetVertexDegree);
-				
-				int targetEdgeCount = (int) (targetVertexDegree * ((float) targetPopulationSize));
-				
+				graph = getRandomGraph(targetPopulationSize, targetEdgeCount);
+								
 				int actualPopulationSize = graph.getVertexCount();
 				int actualEdgeCount = graph.getEdgeCount();
 				
@@ -81,7 +80,7 @@ public class GraphFactory
 			{
 				int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
 				int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
-				int targetEdgeCount = (int) (targetVertexDegree * ((float) targetPopulationSize));
+				int targetEdgeCount = targetVertexDegree * targetPopulationSize;
 				
 				graph = getScaleFreeGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
 				
@@ -119,7 +118,7 @@ public class GraphFactory
 			{
 				int targetPopulationSize = targetPopulationSizes[targetPopulationSizeIndex];
 				int targetVertexDegree = (int) targetVertexDegrees[targetVertexDegreeIndex];
-				int targetEdgeCount = (int) (targetVertexDegree * ((float) targetPopulationSize));
+				int targetEdgeCount = targetVertexDegree * targetPopulationSize;
 				
 				graph = getSmallWorldGraph(targetPopulationSize, targetVertexDegree * targetPopulationSize);
 				
@@ -143,19 +142,15 @@ public class GraphFactory
 		}
 	}
 	
-	public static Graph getRandomGraph(int targetPopulationSize, float targetVertexDegree)
+	// p = (2 * |E|) / |V|^2
+	public static Graph getRandomGraph(int targetPopulationSize, int targetEdgeCount)
 	{
-		// work out probability of a connection
-		double connectionProbability = targetVertexDegree / ((float) targetPopulationSize) * 2.0;
-		
-		// clamp the probability to the range [0, 1]
+		double connectionProbability = 2.0 * (((float) targetEdgeCount) / Math.pow(targetPopulationSize, 2));
 		connectionProbability = (connectionProbability > 1) ? 1 : connectionProbability;
 		connectionProbability = (connectionProbability < 0) ? 0 : connectionProbability;
 		
-		// create a graph generator
 		ErdosRenyiGenerator<MyVertex, MyEdge> generator = new ErdosRenyiGenerator<MyVertex, MyEdge>(undirectedGraphFactory, vertexFactory, edgeFactory, targetPopulationSize, connectionProbability);
 		
-		// create the graph
 		return generator.create();
 	}
 	
