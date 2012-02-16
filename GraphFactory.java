@@ -9,6 +9,9 @@ import edu.uci.ics.jung.algorithms.generators.random.ErdosRenyiGenerator;
 import edu.uci.ics.jung.algorithms.generators.random.BarabasiAlbertGenerator;
 import edu.uci.ics.jung.algorithms.generators.random.KleinbergSmallWorldGenerator;
 
+// Jung misc.
+import edu.uci.ics.jung.io.GraphMLWriter;
+
 // Collection factories
 import org.apache.commons.collections15.functors.ConstantFactory;
 import org.apache.commons.collections15.functors.InstantiateFactory;
@@ -16,6 +19,10 @@ import org.apache.commons.collections15.functors.InstantiateFactory;
 // Java imports
 import java.util.Set;
 import java.util.HashSet;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 public class GraphFactory
 {
@@ -208,5 +215,23 @@ public class GraphFactory
 		generator.setConnectionCount(numberOfLongDistanceConnections);
 		
 		return generator.create();
+	}
+	
+	public static void writeToFile(Graph graph, String filename)
+	{
+		GraphMLWriter<MyVertex, MyEdge> graphMLWriter = new GraphMLWriter<MyVertex, MyEdge>();
+		
+		try
+		{
+			FileWriter fileWriter = new FileWriter(filename);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			PrintWriter printWriter = new PrintWriter(bufferedWriter);
+			
+			graphMLWriter.save(graph, printWriter);
+		} catch (IOException ex)
+		{
+			System.err.println("Could not open " + filename + " for writing");
+			return;
+		}
 	}
 }
