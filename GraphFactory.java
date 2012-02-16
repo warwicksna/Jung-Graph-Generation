@@ -40,28 +40,6 @@ public class GraphFactory
 		}
 	}
 
-	public static Graph getRandomGraph(int targetPopulationSize, float targetVertexDegree, int edgeCountTolerance)
-	{
-		int currentIteration = 0;
-		int maximumNumberOfIterations = 100;
-		
-		Graph generatedGraph;
-		
-		for (currentIteration = 0; currentIteration < maximumNumberOfIterations; currentIteration++)
-		{
-			generatedGraph = getRandomGraph(targetPopulationSize, targetVertexDegree);
-			
-			if (Math.abs(generatedGraph.getEdgeCount() - targetVertexDegree) < edgeCountTolerance)
-			{
-				return generatedGraph;
-			}
-		}
-		
-		System.err.format("Could not find random graph with specifications (%d, %.0f)\n", targetPopulationSize, targetVertexDegree);
-		
-		return null;
-	}
-
 	public static Graph getRandomGraph(int targetPopulationSize, float targetVertexDegree)
 	{
 		// work out probability of a connection
