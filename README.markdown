@@ -8,4 +8,4 @@ To run the code:
 
     perl graph2sql.pl *.graphml
 
-This will read each a.graphml file in the current directory and output a.sql in the same directory.
+This will read each `a.graphml` file in the current directory and output `a.sql` in the same directory.
